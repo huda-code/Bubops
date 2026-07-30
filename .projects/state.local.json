@@ -1,6 +1,7 @@
 {
   "version": 1,
   "project": {
+    "catalog": "prod",
     "initializedAt": "2026-07-30T19:43:35.027Z",
     "merchantDisplayName": "Student",
     "merchantId": "acct_1TycmC78iDMgijfR",
