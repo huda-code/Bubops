@@ -3,6 +3,7 @@ import { setTenantStatus } from "@/app/platform-admin/actions";
 import { getCurrentAccess } from "@/lib/authorization";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { CreateTenantButton } from "./create-tenant-button";
 
 export default async function PlatformAdminPage() {
   const access = await getCurrentAccess();
@@ -94,15 +95,19 @@ export default async function PlatformAdminPage() {
       </section>
 
       <section className="mt-7 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-200 px-6 py-5">
-          <h2 className="text-xl font-bold text-slate-950">
-            Tenant management
-          </h2>
+        <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-5">
+  <div>
+    <h2 className="text-xl font-bold text-slate-950">
+      Tenant management
+    </h2>
 
-          <p className="mt-1 text-sm text-slate-500">
-            Every laundry business and its current BubOps plan.
-          </p>
-        </div>
+    <p className="mt-1 text-sm text-slate-500">
+      Every laundry business and its current BubOps plan.
+    </p>
+  </div>
+
+  <CreateTenantButton />
+</div>
 
         {workspaces.length === 0 ? (
           <div className="px-6 py-12 text-center text-sm text-slate-500">
