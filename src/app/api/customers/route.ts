@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     if (
       role !== "OWNER" &&
-      role !== "EMPLOYEE" &&
+      role !== "MANAGER" &&
       role !== "PLATFORM_ADMIN"
     ) {
       return NextResponse.json(

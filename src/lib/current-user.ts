@@ -9,9 +9,10 @@ export async function getCurrentDatabaseUser() {
   }
 
   const auth0Id = session.user.sub;
+
   const email =
     typeof session.user.email === "string"
-      ? session.user.email
+      ? session.user.email.trim().toLowerCase()
       : `${auth0Id}@bubops.local`;
 
   const name =
@@ -19,20 +20,61 @@ export async function getCurrentDatabaseUser() {
       ? session.user.name
       : null;
 
-  const user = await prisma.user.upsert({
+  const existingByAuth0Id = await prisma.user.findUnique({
     where: {
       auth0Id,
     },
-    update: {
-      email,
-      name,
+  });
+
+  if (existingByAuth0Id) {
+    return prisma.user.update({
+      where: {
+        id: existingByAuth0Id.id,
+      },
+      data: {
+        email,
+        name,
+      },
+    });
+  }
+
+  const existingByEmail = await prisma.user.findFirst({
+    where: {
+      email: {
+        equals: email,
+        mode: "insensitive",
+      },
     },
-    create: {
-      auth0Id,
-      email,
-      name,
+    orderBy: {
+      createdAt: "asc",
     },
   });
 
-  return user;
+  if (existingByEmail) {
+    return prisma.user.update({
+      where: {
+        id: existingByEmail.id,
+      },
+      data: {
+        auth0Id,
+        email,
+        name,
+      },
+    });
+  }
+
+  return prisma.user.upsert({
+  where: {
+    auth0Id,
+  },
+  update: {
+    email,
+    name,
+  },
+  create: {
+    auth0Id,
+    email,
+    name,
+  },
+});
 }

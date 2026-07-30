@@ -6,34 +6,83 @@ export default async function Home() {
 
   if (!session) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-950 px-6 text-white">
-        <section className="max-w-2xl text-center">
-          <p className="text-sm font-medium uppercase tracking-[0.3em] text-cyan-400">
-            BubOps
-          </p>
+      <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-violet-100 px-6 py-12">
+        <section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-xl">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600 text-xl font-bold text-white">
+            B
+          </div>
 
-          <h1 className="mt-5 text-5xl font-semibold tracking-tight">
-            Run your laundry business from one platform.
-          </h1>
+          <div className="mt-6 text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-950">
+              Welcome to BubOps
+            </h1>
 
-          <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-zinc-400">
-            Manage customers, orders, deliveries, employees, and billing
-            with secure multi-tenant access.
-          </p>
+            <p className="mt-2 text-sm text-slate-500">
+              Sign in to your laundry management workspace
+            </p>
+          </div>
 
-          <div className="mt-8 flex justify-center gap-4">
+          <div className="mt-8 space-y-3">
             <a
-              href="/auth/login?screen_hint=signup"
-              className="rounded-lg bg-cyan-400 px-5 py-3 font-semibold text-zinc-950"
+              href="/auth/login"
+              className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-blue-500 to-violet-600 px-5 py-3 font-semibold text-white shadow-sm transition hover:opacity-90"
             >
-              Create business
+              Sign in with Auth0
             </a>
 
             <a
-              href="/auth/login"
-              className="rounded-lg border border-zinc-700 px-5 py-3 font-medium"
+              href="/auth/login?screen_hint=signup"
+              className="flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-800 transition hover:bg-slate-50"
             >
-              Log in
+              Create a business account
+            </a>
+          </div>
+
+          <div className="mt-8 rounded-xl bg-slate-50 p-4">
+            <p className="text-sm font-semibold text-slate-800">
+              Secure access
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              Authentication is handled by Auth0. Only verified email
+              accounts can access BubOps.
+            </p>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (session.user.email_verified !== true) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-violet-100 px-6 py-12">
+        <section className="w-full max-w-md rounded-2xl border border-amber-200 bg-white p-8 text-center shadow-xl">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-2xl">
+            !
+          </div>
+
+          <h1 className="mt-6 text-2xl font-bold text-slate-950">
+            Verify your email
+          </h1>
+
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            Please verify your email address before accessing BubOps.
+            Check your inbox for the verification message from Auth0.
+          </p>
+
+          <div className="mt-7 space-y-3">
+            <a
+              href="/auth/logout"
+              className="flex w-full items-center justify-center rounded-xl bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-slate-800"
+            >
+              Log out
+            </a>
+
+            <a
+              href="/"
+              className="flex w-full items-center justify-center rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-800 transition hover:bg-slate-50"
+            >
+              Check again
             </a>
           </div>
         </section>

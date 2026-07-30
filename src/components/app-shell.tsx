@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  CalendarDays,
   ChevronRight,
   CreditCard,
   LayoutDashboard,
@@ -27,21 +26,161 @@ type AppShellProps = {
   description: string;
 };
 
-const ownerLinks = [
-  { label: "Dashboard", icon: LayoutDashboard, href: "/" },
-  { label: "Orders", icon: Shirt, href: "/orders" },
-  { label: "Customers", icon: UsersRound, href: "/customers" },
-  { label: "Delivery", icon: Truck, href: "/delivery" },
-  { label: "Employees", icon: UserRound, href: "/employees" },
-  { label: "Billing", icon: CreditCard, href: "/billing" },
-  { label: "Settings", icon: Settings, href: "/settings" },
+type NavigationLink = {
+  label: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+};
+
+const platformAdminLinks: NavigationLink[] = [
+  {
+    label: "Platform Dashboard",
+    icon: LayoutDashboard,
+    href: "/platform-admin",
+  },
+  {
+    label: "Tenants",
+    icon: UsersRound,
+    href: "/platform-admin",
+  },
+  {
+    label: "Platform Orders",
+    icon: Shirt,
+    href: "/platform-admin/orders",
+  },
+  {
+    label: "Drivers",
+    icon: Truck,
+    href: "/platform-admin/drivers",
+  },
+  {
+    label: "Plans & Billing",
+    icon: CreditCard,
+    href: "/platform-admin/billing",
+  },
+  {
+    label: "Settings",
+    icon: Settings,
+    href: "/settings",
+  },
 ];
 
-const driverLinks = [
-  { label: "Driver Portal", icon: Truck, href: "/driver" },
-  { label: "Delivery", icon: CalendarDays, href: "/delivery" },
-  { label: "Settings", icon: Settings, href: "/settings" },
+const ownerLinks: NavigationLink[] = [
+  {
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    href: "/",
+  },
+  {
+    label: "Orders",
+    icon: Shirt,
+    href: "/orders",
+  },
+  {
+    label: "Customers",
+    icon: UsersRound,
+    href: "/customers",
+  },
+  {
+    label: "Delivery",
+    icon: Truck,
+    href: "/delivery",
+  },
+  {
+    label: "Employees",
+    icon: UserRound,
+    href: "/employees",
+  },
+  {
+    label: "Billing",
+    icon: CreditCard,
+    href: "/billing",
+  },
+  {
+    label: "Settings",
+    icon: Settings,
+    href: "/settings",
+  },
 ];
+
+const managerLinks: NavigationLink[] = [
+  {
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    href: "/",
+  },
+  {
+    label: "Orders",
+    icon: Shirt,
+    href: "/orders",
+  },
+  {
+    label: "Customers",
+    icon: UsersRound,
+    href: "/customers",
+  },
+  {
+    label: "Delivery",
+    icon: Truck,
+    href: "/delivery",
+  },
+  {
+    label: "Settings",
+    icon: Settings,
+    href: "/settings",
+  },
+];
+
+const driverLinks: NavigationLink[] = [
+  {
+    label: "Driver Portal",
+    icon: Truck,
+    href: "/driver",
+  },
+  {
+    label: "Settings",
+    icon: Settings,
+    href: "/settings",
+  },
+];
+
+function getNavigationLinks(role: string) {
+  switch (role.toUpperCase()) {
+    case "PLATFORM_ADMIN":
+      return platformAdminLinks;
+
+    case "OWNER":
+      return ownerLinks;
+
+    case "MANAGER":
+      return managerLinks;
+
+    case "DRIVER":
+      return driverLinks;
+
+    default:
+      return [];
+  }
+}
+
+function formatRole(role: string) {
+  switch (role.toUpperCase()) {
+    case "PLATFORM_ADMIN":
+      return "Platform Admin";
+
+    case "OWNER":
+      return "Owner";
+
+    case "MANAGER":
+      return "Manager";
+
+    case "DRIVER":
+      return "Driver";
+
+    default:
+      return role;
+  }
+}
 
 export default function AppShell({
   children,
@@ -54,7 +193,8 @@ export default function AppShell({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
 
-  const links = role === "DRIVER" ? driverLinks : ownerLinks;
+  const normalizedRole = role.toUpperCase();
+  const links = getNavigationLinks(normalizedRole);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
@@ -105,9 +245,20 @@ export default function AppShell({
           </button>
         </div>
 
+        <div className="border-b border-white/15 px-5 py-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
+            Current access
+          </p>
+
+          <p className="mt-1 text-sm font-semibold">
+            {formatRole(normalizedRole)}
+          </p>
+        </div>
+
         <nav className="flex-1 space-y-1 overflow-y-auto px-4 py-5">
           {links.map((link) => {
             const Icon = link.icon;
+
             const isActive =
               link.href === "/"
                 ? pathname === "/"
@@ -115,7 +266,7 @@ export default function AppShell({
 
             return (
               <Link
-                key={link.label}
+                key={`${normalizedRole}-${link.href}`}
                 href={link.href}
                 onClick={() => setSidebarOpen(false)}
                 className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
@@ -133,6 +284,18 @@ export default function AppShell({
               </Link>
             );
           })}
+
+          {links.length === 0 ? (
+            <div className="rounded-xl border border-white/20 bg-white/10 p-4">
+              <p className="text-sm font-semibold">
+                No access configured
+              </p>
+
+              <p className="mt-1 text-xs leading-5 text-white/70">
+                Contact the BubOps platform administrator.
+              </p>
+            </div>
+          ) : null}
         </nav>
 
         <div className="border-t border-white/20 p-4">
@@ -145,8 +308,9 @@ export default function AppShell({
               <p className="truncate text-sm font-semibold">
                 {email}
               </p>
-              <p className="text-xs capitalize text-white/70">
-                {role.toLowerCase()} · {plan} plan
+
+              <p className="text-xs text-white/70">
+                {formatRole(normalizedRole)} · {plan} Plan
               </p>
             </div>
           </div>
@@ -164,7 +328,11 @@ export default function AppShell({
       <div className="mx-auto max-w-7xl px-6 pb-12 pt-20">
         <section className="rounded-2xl bg-gradient-to-r from-blue-500 via-violet-500 to-violet-700 px-8 py-8 text-white shadow-lg">
           <p className="text-sm font-medium text-white/75">
-            BubOps Laundry Management
+            {normalizedRole === "PLATFORM_ADMIN"
+              ? "BubOps Platform Administration"
+              : normalizedRole === "DRIVER"
+                ? "BubOps Driver Operations"
+                : "BubOps Laundry Management"}
           </p>
 
           <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
