@@ -1,6 +1,6 @@
 "use client";
 
-
+import AppShell from "@/components/app-shell";
 import CreateCustomerForm from "@/components/create-customer-form";
 import CreateOrderForm from "@/components/create-order-form";
 import BillingButton from "@/components/billing-button";
@@ -168,55 +168,22 @@ export default function BubOpsDashboard({
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-950 text-white">
+      <main className="flex min-h-screen items-center justify-center bg-zinc-950 text-slate-950">
         <p className="text-zinc-400">Loading BubOps...</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
-      <div className="mx-auto max-w-7xl px-6 py-8">
-        <header className="flex flex-col justify-between gap-6 border-b border-zinc-800 pb-7 md:flex-row md:items-center">
-          <div>
-            <p className="text-sm font-medium text-cyan-400">
-              Laundry operations platform
-            </p>
-
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-              BubOps
-            </h1>
-
-            <p className="mt-2 text-sm text-zinc-400">
-              {data.workspace?.name ?? "My laundry business"}
-            </p>
-          </div>
-
-        <div className="flex flex-wrap items-center justify-end gap-4">
-  <div className="text-right">
-    <p className="text-sm text-zinc-200">{email}</p>
-    <p className="text-xs text-zinc-500">
-      {data.workspace?.role ?? "OWNER"} ·{" "}
-      {data.workspace?.plan ?? "free"} plan
-    </p>
-  </div>
-
- {["OWNER", "PLATFORM_ADMIN"].includes(
-  data.workspace?.role ?? "",
-) ? (
-  <BillingButton
-    isPro={data.workspace?.plan?.toLowerCase() === "pro"}
-  />
-) : null}
-
-  <a
-    href="/auth/logout"
-    className="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-500 hover:text-white"
-  >
-    Log out
-  </a>
-</div>
-        </header>
+  <AppShell
+  email={email}
+  role={data.workspace?.role ?? "OWNER"}
+  plan={data.workspace?.plan ?? "free"}
+  title="Dashboard"
+  description="Overview of your laundry business operations"
+>
+  <div>
+       
 
         {error ? (
           <div className="mt-6 rounded-xl border border-red-900 bg-red-950/40 px-4 py-3 text-sm text-red-300">
@@ -252,7 +219,7 @@ export default function BubOpsDashboard({
           />
         </section>
 
-        <section className="mt-8 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
+        <section className="mt-8 rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
             <div>
               <p className="text-sm font-medium text-cyan-400">
@@ -264,7 +231,7 @@ export default function BubOpsDashboard({
               </h2>
             </div>
 
-            <span className="w-fit rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs uppercase tracking-wide text-zinc-300">
+            <span className="w-fit rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs uppercase tracking-wide text-slate-300">
              {data.workspace?.plan?.toLowerCase() === "pro"
   ? "ACTIVE"
   : "FREE"}
@@ -296,7 +263,7 @@ export default function BubOpsDashboard({
   onCreated={() => void loadDashboard()}
 />
 
-        <section className="mt-8 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40">
+        <section className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-5">
             <div>
               <p className="text-sm font-medium text-cyan-400">
@@ -311,7 +278,7 @@ export default function BubOpsDashboard({
             <button
               type="button"
               onClick={() => void loadDashboard()}
-              className="rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-300 transition hover:border-zinc-500 hover:text-white"
+              className="rounded-lg border border-zinc-700 px-3 py-2 text-sm text-slate-300 transition hover:border-zinc-500 hover: text-slate-950"
             >
               Refresh
             </button>
@@ -323,14 +290,14 @@ export default function BubOpsDashboard({
                 No orders yet
               </p>
 
-              <p className="mt-1 text-sm text-zinc-500">
+              <p className="mt-1 text-sm text-slate-500">
                 Create your first laundry order to begin operations.
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[800px] text-left">
-                <thead className="border-b border-zinc-800 text-xs uppercase tracking-wide text-zinc-500">
+                <thead className="border-b border-zinc-800 text-xs uppercase tracking-wide text-slate-500">
                   <tr>
                     <th className="px-6 py-4 font-medium">Order</th>
                     <th className="px-6 py-4 font-medium">
@@ -354,26 +321,26 @@ export default function BubOpsDashboard({
                       className="border-b border-zinc-800/70 last:border-0"
                     >
                       <td className="px-6 py-5">
-                        <p className="font-medium text-white">
+                        <p className="font-medium text-slate-950">
                           {order.orderNumber}
                         </p>
 
-                        <p className="mt-1 text-xs text-zinc-500">
+                        <p className="mt-1 text-xs text-slate-500">
                           {formatDate(order.createdAt)}
                         </p>
                       </td>
 
-                      <td className="px-6 py-5 text-sm text-zinc-300">
+                      <td className="px-6 py-5 text-sm text-slate-300">
                         {order.customer.fullName}
                       </td>
 
-                      <td className="px-6 py-5 text-sm text-zinc-300">
+                      <td className="px-6 py-5 text-sm text-slate-300">
                         {order.items
                           .map((item) => item.serviceName)
                           .join(", ")}
                       </td>
 
-                      <td className="px-6 py-5 text-sm text-zinc-300">
+                      <td className="px-6 py-5 text-sm text-slate-300">
                         {formatDate(order.deliveryDate)}
                       </td>
 
@@ -409,8 +376,8 @@ export default function BubOpsDashboard({
   }
 />
         </section>
-      </div>
-    </main>
+       </div>
+</AppShell>
   );
 }
 
@@ -424,10 +391,10 @@ function MetricCard({
   detail: string;
 }) {
   return (
-    <article className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
-      <p className="text-sm text-zinc-500">{label}</p>
+    <article className="rounded-2xl border border-slate-200 bg-white shadow-sm p-5">
+      <p className="text-sm text-slate-500">{label}</p>
       <p className="mt-3 text-3xl font-semibold">{value}</p>
-      <p className="mt-2 text-xs text-zinc-500">{detail}</p>
+      <p className="mt-2 text-xs text-slate-500">{detail}</p>
     </article>
   );
 }
@@ -442,8 +409,8 @@ function SummaryCard({
   description: string;
 }) {
   return (
-    <article className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-      <p className="text-sm text-zinc-500">{title}</p>
+    <article className="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
+      <p className="text-sm text-slate-500">{title}</p>
       <p className="mt-2 text-xl font-semibold">{value}</p>
       <p className="mt-2 text-sm leading-6 text-zinc-400">
         {description}
@@ -468,7 +435,7 @@ function StatusBadge({ status }: { status: string }) {
     <span
       className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-medium ${
         styles[status] ??
-        "border-zinc-700 bg-zinc-800 text-zinc-300"
+        "border-zinc-700 bg-zinc-800 text-slate-300"
       }`}
     >
       {formatStatus(status)}
