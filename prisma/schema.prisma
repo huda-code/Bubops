@@ -1,0 +1,342 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MembershipRole {
+  PLATFORM_ADMIN
+  OWNER
+  EMPLOYEE
+  DRIVER
+}
+
+enum TenantStatus {
+  TRIAL
+  ACTIVE
+  SUSPENDED
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  READY
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+}
+
+enum ServiceType {
+  WASH_AND_FOLD
+  DRY_CLEAN
+  PRESS_ONLY
+  PREMIUM_CLEAN
+  EXPRESS_SERVICE
+}
+
+enum OrderPriority {
+  LOW
+  NORMAL
+  HIGH
+}
+
+enum DriverStatus {
+  AVAILABLE
+  BUSY
+  OFF_DUTY
+}
+
+enum DeliveryTaskType {
+  PICKUP
+  DELIVERY
+}
+
+enum DeliveryStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum SubscriptionStatus {
+  FREE
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  auth0Id   String   @unique
+  email     String
+  name      String?
+  phone     String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships   Membership[]
+  createdOrders LaundryOrder[] @relation("OrderCreator")
+  driverProfile DriverProfile?
+  auditLogs     AuditLog[]
+}
+
+model Workspace {
+  id                  String       @id @default(cuid())
+  name                String
+  slug                String       @unique
+  status              TenantStatus @default(TRIAL)
+  auth0OrganizationId String?      @unique
+
+  businessEmail   String?
+  businessPhone   String?
+  businessAddress String?
+  city            String?
+  state           String?
+  zipCode         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships   Membership[]
+  customers     Customer[]
+  orders        LaundryOrder[]
+  drivers       DriverProfile[]
+  deliveryTasks DeliveryTask[]
+  subscription  Subscription?
+  usageEvents   UsageEvent[]
+  auditLogs     AuditLog[]
+}
+
+model Membership {
+  id          String         @id @default(cuid())
+  userId      String
+  workspaceId String
+  role        MembershipRole @default(EMPLOYEE)
+  createdAt   DateTime       @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+  @@index([workspaceId])
+  @@index([role])
+}
+
+model Customer {
+  id          String @id @default(cuid())
+  workspaceId String
+
+  fullName         String
+  email            String?
+  phone            String?
+  address          String?
+  city             String?
+  state            String?
+  zipCode          String?
+  preferredService ServiceType?
+  notes            String?
+  isActive         Boolean      @default(true)
+  totalOrders      Int          @default(0)
+  totalSpentCents  Int          @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workspace Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  orders    LaundryOrder[]
+
+  @@index([workspaceId])
+  @@index([email])
+  @@index([phone])
+}
+
+model LaundryOrder {
+  id               String  @id @default(cuid())
+  workspaceId      String
+  customerId       String
+  createdById      String
+  assignedDriverId String?
+
+  orderNumber   String        @unique
+  status        OrderStatus   @default(PENDING)
+  priority      OrderPriority @default(NORMAL)
+  paymentStatus PaymentStatus @default(PENDING)
+
+  subtotalCents    Int @default(0)
+  taxCents         Int @default(0)
+  discountCents    Int @default(0)
+  deliveryFeeCents Int @default(0)
+  totalCents       Int @default(0)
+
+  pickupAddress   String?
+  deliveryAddress String?
+  pickupDate      DateTime?
+  deliveryDate    DateTime?
+  notes           String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workspace      Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  customer       Customer       @relation(fields: [customerId], references: [id])
+  createdBy      User           @relation("OrderCreator", fields: [createdById], references: [id])
+  assignedDriver DriverProfile? @relation(fields: [assignedDriverId], references: [id], onDelete: SetNull)
+
+  items         OrderItem[]
+  deliveryTasks DeliveryTask[]
+
+  @@index([workspaceId])
+  @@index([customerId])
+  @@index([status])
+  @@index([assignedDriverId])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+
+  serviceType    ServiceType
+  serviceName    String
+  quantity       Float
+  unit           String
+  unitPriceCents Int
+  totalCents     Int
+  notes          String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order LaundryOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+model DriverProfile {
+  id          String @id @default(cuid())
+  workspaceId String
+  userId      String @unique
+
+  status        DriverStatus @default(AVAILABLE)
+  vehicleName   String?
+  vehicleNumber String?
+  licenseNumber String?
+  serviceArea   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workspace      Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignedOrders LaundryOrder[]
+  deliveryTasks  DeliveryTask[]
+
+  @@index([workspaceId])
+  @@index([status])
+}
+
+model DeliveryTask {
+  id          String  @id @default(cuid())
+  workspaceId String
+  orderId     String
+  driverId    String?
+
+  taskType    DeliveryTaskType
+  status      DeliveryStatus   @default(SCHEDULED)
+  scheduledAt DateTime?
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  customerName    String
+  customerPhone   String?
+  customerAddress String
+  timeSlot        String?
+  notes           String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workspace Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  order     LaundryOrder   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  driver    DriverProfile? @relation(fields: [driverId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([orderId])
+  @@index([driverId])
+  @@index([status])
+}
+
+model Subscription {
+  id          String @id @default(cuid())
+  workspaceId String @unique
+
+  stripeCustomerId     String? @unique
+  stripeSubscriptionId String? @unique
+  stripePriceId        String?
+
+  plan               String             @default("free")
+  status             SubscriptionStatus @default(FREE)
+  orderLimit         Int                @default(25)
+  monthlyOrdersUsed  Int                @default(0)
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean            @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model UsageEvent {
+  id          String @id @default(cuid())
+  workspaceId String
+
+  type       String
+  quantity   Int      @default(1)
+  resourceId String?
+  stripeSent Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([type])
+  @@index([stripeSent])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id          String  @id @default(cuid())
+  workspaceId String
+  userId      String?
+
+  action       String
+  resourceType String
+  resourceId   String?
+  oldValues    Json?
+  newValues    Json?
+  metadata     Json?
+
+  createdAt DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([resourceType])
+  @@index([createdAt])
+}

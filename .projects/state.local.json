@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "project": {
+    "initializedAt": "2026-07-30T19:43:35.027Z",
+    "merchantDisplayName": "Student",
+    "merchantId": "acct_1TycmC78iDMgijfR",
+    "projectId": "project_61V8Np0jipdOsvNgi16V80jY8pSQajUS99w8qr7Si7F2",
+    "projectName": "bubops"
+  },
+  "providers": {
+    "auth0": {
+      "accountRequestId": "facctrq_61V8NqsjXPyaXMRrs16V80jY8pSQajUS99w8qr7Si2z2",
+      "configuration": {
+        "locality": "us",
+        "naming_prefix": "bubops"
+      },
+      "linkedAt": "2026-07-30T19:45:37.910Z",
+      "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
+      "providerName": "Auth0",
+      "redirectUrl": null,
+      "requestedAt": "2026-07-30T19:45:37.910Z",
+      "status": "complete"
+    }
+  },
+  "resources": {
+    "auth0-client": {
+      "configuration": {
+        "name": "bubops"
+      },
+      "createdAt": "2026-07-30T19:47:57.770Z",
+      "lastRevealedAt": "2026-07-30T19:47:57.923Z",
+      "lastStatus": "complete",
+      "name": "auth0-client",
+      "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
+      "providerName": "Auth0",
+      "resourceId": "fres_61V8NtCPlfTs6S9Jk16V80jY8pSQajUS99w8qr7SiPxY",
+      "serviceId": "client"
+    },
+    "auth0-plan": {
+      "configuration": {},
+      "createdAt": "2026-07-30T19:47:53.375Z",
+      "lastRevealedAt": "2026-07-30T19:47:53.595Z",
+      "lastStatus": "complete",
+      "name": "auth0-plan",
+      "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
+      "providerName": "Auth0",
+      "resourceId": "fres_61V8Nt8fgVqSLB46p16V80jY8pSQajUS99w8qr7SiG80",
+      "serviceId": "free"
+    }
+  }
+}
