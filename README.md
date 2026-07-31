@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BubOps
 
-## Getting Started
+BubOps is a multi-tenant SaaS platform for laundry businesses, built for the Auth0 x Stripe hackathon.
 
-First, run the development server:
+## Live Application
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+https://bubops-new.vercel.app
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Stripe Projects Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+https://projects.dev/s#v1:Auth0~client
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Stripe Projects was used to initialize the project and provision the Auth0 client.
 
-## Learn More
+## Stripe Integration
 
-To learn more about Next.js, take a look at the following resources:
+BubOps uses Stripe for subscription billing:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Stripe Checkout
+- Stripe Billing Portal
+- Stripe webhooks
+- Recurring monthly subscriptions
+- Test-mode payment processing
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### BubOps Pro
 
-## Deploy on Vercel
+- Price: $49 per month
+- Monthly order limit: 1,000 orders
+- Stripe Price ID: `price_1Tz0GP78iDMgijfRTnbg9FKD`
+- Product: `BubOps Pro`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Payment Flow
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. A laundry owner opens the Billing page.
+2. BubOps creates a Stripe Checkout Session.
+3. Stripe securely collects the payment.
+4. Stripe sends a `checkout.session.completed` webhook.
+5. BubOps verifies the webhook signature.
+6. The tenant is upgraded to the Pro plan.
+
+### Production Webhook
+
+```text
+https://bubops-new.vercel.app/api/stripe/webhook
